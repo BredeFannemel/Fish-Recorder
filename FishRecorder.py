@@ -4,7 +4,7 @@ from tkinter import ttk, messagebox
 class BMK_rec(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("BMK rec v.1.0")
+        self.title("Fish-Recorder")
         self.selected_fields = ["Animal ID", "Weight", "Sex", "Selection", "Freefield 1", "Freefield 2"]
         self.create_widgets()
 
