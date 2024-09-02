@@ -4,8 +4,9 @@ from tkinter import ttk, messagebox
 class BMK_rec(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Fish-Recorder")
+        self.title("BMK rec v.1.0")
         self.selected_fields = ["Animal ID", "Weight", "Sex", "Selection", "Freefield 1", "Freefield 2"]
+        self.recorded_data = []  # Initialize the list to store records
         self.create_widgets()
 
     def create_widgets(self):
@@ -50,6 +51,12 @@ class BMK_rec(tk.Tk):
         self.save_button.grid(row=6, column=0, columnspan=2, pady=10)
         self.save_button.bind("<Return>", lambda event: self.save_record())
 
+        # Summary Table
+        self.summary_label = ttk.Label(self, text="Summary")
+        self.summary_label.grid(row=7, column=0, columnspan=2, pady=10)
+        self.summary_text = tk.Text(self, height=10, width=50)
+        self.summary_text.grid(row=8, column=0, columnspan=2, padx=10, pady=5)
+
     def validate_float(self, value_if_allowed):
         """ Validate that the input is a float number """
         if value_if_allowed in ["", "-", ".", "-."]:
@@ -73,8 +80,9 @@ class BMK_rec(tk.Tk):
 
         # Check if all required fields are filled
         if all(record.values()):
-            # Assuming a recorded_data list to store records
+            # Store the record
             self.recorded_data.append(record)
+            self.update_summary()
             self.clear_form()
 
             messagebox.showinfo("Success", "Record saved successfully!")
@@ -90,6 +98,16 @@ class BMK_rec(tk.Tk):
         self.freefield1_entry.delete(0, tk.END)
         self.freefield2_entry.delete(0, tk.END)
 
+    def update_summary(self):
+        """ Update the summary table with recorded data """
+        self.summary_text.delete(1.0, tk.END)
+        if self.recorded_data:
+            for record in self.recorded_data:
+                self.summary_text.insert(tk.END, f"{record}\n")
+        else:
+            self.summary_text.insert(tk.END, "No records available.\n")
+
 if __name__ == "__main__":
     app = BMK_rec()
     app.mainloop()
+
