@@ -1,74 +1,91 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
-from collections import defaultdict
 
 class FishRecorder(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Fish Recorder")
-        self.selected_fields = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield 1", "Freefield 2"]
+        self.available_traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield 1", "Freefield 2"]
+        self.selected_traits = []
+        self.available_stats = ["Number of Fish Recorded", "Average Weight", "Average Weight per Sex", "Percentage of Mature Fish"]
+        self.selected_stats = []
         self.recorded_data = []  # Initialize the list to store records
-        self.statistics_options = defaultdict(list)  # Store options for statistics
+        self.load_existing_data()
         self.create_widgets()
 
     def create_widgets(self):
-        # Animal ID entry
-        self.animal_entry_label = ttk.Label(self, text="Animal ID:")
-        self.animal_entry = ttk.Entry(self)
-        self.animal_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
-        self.animal_entry_label.grid(row=0, column=0, padx=10, pady=5, sticky="e")
+        # Trait selection
+        self.trait_selection_label = ttk.Label(self, text="Select Traits to Record:")
+        self.trait_selection_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
-        # Weight entry with float validation
-        self.weight_label = ttk.Label(self, text="Weight:")
-        self.weight_entry = ttk.Entry(self, validate="key", validatecommand=(self.register(self.validate_float), '%P'))
-        self.weight_label.grid(row=1, column=0, padx=10, pady=5, sticky="e")
-        self.weight_entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+        self.trait_selection_vars = {trait: tk.BooleanVar() for trait in self.available_traits}
+        for idx, trait in enumerate(self.available_traits):
+            chk = ttk.Checkbutton(self, text=trait, variable=self.trait_selection_vars[trait])
+            chk.grid(row=idx + 1, column=0, padx=10, pady=2, sticky="w")
 
-        # Sex combobox
-        self.sex_label = ttk.Label(self, text="Sex:")
-        self.sex_combobox = ttk.Combobox(self, values=["Female", "Male", "Unknown"], state="readonly")
-        self.sex_label.grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        self.sex_combobox.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+        # Apply trait selection button
+        self.apply_button = ttk.Button(self, text="Apply Selection", command=self.apply_trait_selection)
+        self.apply_button.grid(row=len(self.available_traits) + 1, column=0, pady=10)
 
-        # Maturation combobox
-        self.maturation_label = ttk.Label(self, text="Maturation:")
-        self.maturation_combobox = ttk.Combobox(self, values=["Mature", "Immature", "Unknown"], state="readonly")
-        self.maturation_label.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.maturation_combobox.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+        # Statistic selection
+        self.stat_selection_label = ttk.Label(self, text="Select Statistics to Display:")
+        self.stat_selection_label.grid(row=len(self.available_traits) + 2, column=0, padx=10, pady=5, sticky="w")
 
-        # Selection combobox
-        self.selection_label = ttk.Label(self, text="Selection:")
-        self.selection_combobox = ttk.Combobox(self, values=["Selected", "Culled"], state="readonly")
-        self.selection_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
-        self.selection_combobox.grid(row=4, column=1, padx=10, pady=5, sticky="w")
+        self.stat_selection_vars = {stat: tk.BooleanVar() for stat in self.available_stats}
+        for idx, stat in enumerate(self.available_stats):
+            chk = ttk.Checkbutton(self, text=stat, variable=self.stat_selection_vars[stat])
+            chk.grid(row=len(self.available_traits) + 3 + idx, column=0, padx=10, pady=2, sticky="w")
 
-        # Freefield1 entry
-        self.freefield1_entry_label = ttk.Label(self, text="Freefield 1:")
-        self.freefield1_entry = ttk.Entry(self)
-        self.freefield1_entry.grid(row=5, column=1, padx=10, pady=5, sticky="w")
-        self.freefield1_entry_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
+        # Apply statistic selection button
+        self.apply_stat_button = ttk.Button(self, text="Apply Statistics", command=self.apply_stat_selection)
+        self.apply_stat_button.grid(row=len(self.available_traits) + 3 + len(self.available_stats), column=0, pady=10)
 
-        # Freefield2 entry
-        self.freefield2_entry_label = ttk.Label(self, text="Freefield 2:")
-        self.freefield2_entry = ttk.Entry(self)
-        self.freefield2_entry.grid(row=6, column=1, padx=10, pady=5, sticky="w")
-        self.freefield2_entry_label.grid(row=6, column=0, padx=10, pady=5, sticky="e")
+        # Dynamic form area
+        self.form_frame = ttk.Frame(self)
+        self.form_frame.grid(row=0, column=1, rowspan=len(self.available_traits) + 4 + len(self.available_stats), padx=10, pady=5, sticky="n")
 
         # Save button
         self.save_button = ttk.Button(self, text="Save", command=self.save_record)
-        self.save_button.grid(row=7, column=0, columnspan=2, pady=10)
+        self.save_button.grid(row=len(self.available_traits) + 4 + len(self.available_stats), column=0, columnspan=2, pady=10)
         self.save_button.bind("<Return>", lambda event: self.save_record())
-
-        # Statistics configuration button
-        self.stats_button = ttk.Button(self, text="Configure Statistics", command=self.configure_statistics)
-        self.stats_button.grid(row=8, column=0, columnspan=2, pady=10)
 
         # Summary Table
         self.summary_label = ttk.Label(self, text="Summary")
-        self.summary_label.grid(row=9, column=0, columnspan=2, pady=10)
+        self.summary_label.grid(row=len(self.available_traits) + 5 + len(self.available_stats), column=0, columnspan=2, pady=10)
         self.summary_text = tk.Text(self, height=10, width=50)
-        self.summary_text.grid(row=10, column=0, columnspan=2, padx=10, pady=5)
+        self.summary_text.grid(row=len(self.available_traits) + 6 + len(self.available_stats), column=0, columnspan=2, padx=10, pady=5)
+
+    def apply_trait_selection(self):
+        """Apply selected traits and dynamically create form fields."""
+        for widget in self.form_frame.winfo_children():
+            widget.destroy()  # Clear previous widgets
+
+        self.selected_traits = [trait for trait, var in self.trait_selection_vars.items() if var.get()]
+
+        self.entry_widgets = {}
+        for idx, trait in enumerate(self.selected_traits):
+            label = ttk.Label(self.form_frame, text=f"{trait}:")
+            label.grid(row=idx, column=0, padx=10, pady=5, sticky="e")
+
+            if trait == "Weight":
+                entry = ttk.Entry(self.form_frame, validate="key", validatecommand=(self.register(self.validate_float), '%P'))
+            elif trait == "Sex":
+                entry = ttk.Combobox(self.form_frame, values=["Female", "Male", "Unknown"], state="readonly")
+            elif trait == "Maturation":
+                entry = ttk.Combobox(self.form_frame, values=["Mature", "Immature", "Unknown"], state="readonly")
+            elif trait == "Selection":
+                entry = ttk.Combobox(self.form_frame, values=["Selected", "Culled"], state="readonly")
+            else:
+                entry = ttk.Entry(self.form_frame)
+
+            entry.grid(row=idx, column=1, padx=10, pady=5, sticky="w")
+            self.entry_widgets[trait] = entry
+
+    def apply_stat_selection(self):
+        """Apply selected statistics to display in the summary."""
+        self.selected_stats = [stat for stat, var in self.stat_selection_vars.items() if var.get()]
+        self.update_summary()
 
     def validate_float(self, value_if_allowed):
         """ Validate that the input is a float number """
@@ -81,116 +98,101 @@ class FishRecorder(tk.Tk):
             return False
 
     def save_record(self):
-        # Gather data from fields
-        record = {
-            "Animal ID": self.animal_entry.get().strip(),
-            "Weight": self.weight_entry.get().strip(),
-            "Sex": self.sex_combobox.get(),
-            "Maturation": self.maturation_combobox.get(),
-            "Selection": self.selection_combobox.get(),
-            "Freefield 1": self.freefield1_entry.get().strip(),
-            "Freefield 2": self.freefield2_entry.get().strip(),
-        }
+        """ Save the current record """
+        record = {trait: self.entry_widgets[trait].get().strip() for trait in self.selected_traits}
 
-        # Check if all required fields are filled
-        if all(record.values()):
-            # Store the record
-            self.recorded_data.append(record)
-            self.update_summary()
-            self.save_to_file(record)
-            self.clear_form()
+        # Ensure Animal ID is filled out, the rest can be optional
+        if "Animal ID" in record and record["Animal ID"]:
+            # Check for duplicate Animal ID in existing records
+            if self.is_duplicate_animal_id(record["Animal ID"]):
+                self.entry_widgets["Animal ID"].config(background="red")
+                messagebox.showwarning("Duplicate ID", "This Animal ID already exists in the records.")
+            else:
+                self.entry_widgets["Animal ID"].config(background="white")  # Reset background color
 
-            messagebox.showinfo("Success", "Record saved successfully!")
+                # Store the record
+                self.recorded_data.append(record)
+                self.update_summary()
+                self.save_to_file(record)
+                self.clear_form()
+
+                messagebox.showinfo("Success", "Record saved successfully!")
         else:
-            messagebox.showwarning("Warning", "Please fill out all fields.")
+            messagebox.showwarning("Warning", "Please fill out the Animal ID field.")
+
+    def is_duplicate_animal_id(self, animal_id):
+        """ Check if the given Animal ID already exists in the recorded data """
+        for record in self.recorded_data:
+            if record["Animal ID"] == animal_id:
+                return True
+        return False
 
     def save_to_file(self, record):
         """ Save the current record to a text file in tabulated format """
         with open('fish_records.txt', 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=self.selected_fields, delimiter='\t')
+            writer = csv.DictWriter(file, fieldnames=self.selected_traits, delimiter='\t')
             if file.tell() == 0:  # Write header if the file is new/empty
                 writer.writeheader()
             writer.writerow(record)
 
+    def load_existing_data(self):
+        """ Load existing records from the file into the recorded_data list """
+        try:
+            with open('fish_records.txt', 'r') as file:
+                reader = csv.DictReader(file, delimiter='\t')
+                self.recorded_data = [row for row in reader]
+        except FileNotFoundError:
+            pass  # No existing file found, start with an empty list
+
     def clear_form(self):
         """ Clear all fields after saving a record """
-        self.animal_entry.delete(0, tk.END)
-        self.weight_entry.delete(0, tk.END)
-        self.sex_combobox.set('')
-        self.maturation_combobox.set('')
-        self.selection_combobox.set('')
-        self.freefield1_entry.delete(0, tk.END)
-        self.freefield2_entry.delete(0, tk.END)
+        for entry in self.entry_widgets.values():
+            if isinstance(entry, ttk.Entry):
+                entry.delete(0, tk.END)
+            elif isinstance(entry, ttk.Combobox):
+                entry.set('')
 
     def update_summary(self):
         """ Update the summary table with recorded data """
         self.summary_text.delete(1.0, tk.END)
-        if self.recorded_data:
-            for record in self.recorded_data:
-                self.summary_text.insert(tk.END, f"{record}\n")
-        else:
+        if not self.recorded_data:
             self.summary_text.insert(tk.END, "No records available.\n")
+            return
 
-    def configure_statistics(self):
-        """ Open a new window to configure which statistics to display """
-        self.stats_window = tk.Toplevel(self)
-        self.stats_window.title("Configure Statistics")
+        summary = []
+        if "Number of Fish Recorded" in self.selected_stats:
+            summary.append(f"Number of Fish Recorded: {len(self.recorded_data)}")
 
-        # Checkbuttons for statistics options
-        self.avg_weight_var = tk.BooleanVar()
-        self.avg_weight_sex_var = tk.BooleanVar()
-        self.avg_weight_maturation_var = tk.BooleanVar()
+        if "Average Weight" in self.selected_stats:
+            weights = [float(record["Weight"]) for record in self.recorded_data if "Weight" in record and record["Weight"]]
+            if weights:
+                average_weight = sum(weights) / len(weights)
+                summary.append(f"Average Weight: {average_weight:.2f}")
 
-        tk.Checkbutton(self.stats_window, text="Average Weight", variable=self.avg_weight_var).grid(row=0, column=0, sticky="w")
-        tk.Checkbutton(self.stats_window, text="Average Weight by Sex", variable=self.avg_weight_sex_var).grid(row=1, column=0, sticky="w")
-        tk.Checkbutton(self.stats_window, text="Average Weight by Maturation", variable=self.avg_weight_maturation_var).grid(row=2, column=0, sticky="w")
-
-        ttk.Button(self.stats_window, text="Apply", command=self.apply_statistics).grid(row=3, column=0, pady=10)
-
-    def apply_statistics(self):
-        """ Apply the selected statistics configuration """
-        self.statistics_options.clear()
-
-        if self.avg_weight_var.get():
-            self.statistics_options['Overall'].append('Weight')
-        if self.avg_weight_sex_var.get():
-            self.statistics_options['Sex'].append('Weight')
-        if self.avg_weight_maturation_var.get():
-            self.statistics_options['Maturation'].append('Weight')
-
-        self.update_summary_with_statistics()
-        self.stats_window.destroy()
-
-    def update_summary_with_statistics(self):
-        """ Update the summary with selected statistics """
-        summary_stats = {}
-
-        # Calculate and display average weight
-        if 'Overall' in self.statistics_options:
-            avg_weight = sum(float(record["Weight"]) for record in self.recorded_data) / len(self.recorded_data)
-            summary_stats['Average Weight'] = avg_weight
-
-        if 'Sex' in self.statistics_options:
-            sex_groups = defaultdict(list)
+        if "Average Weight per Sex" in self.selected_stats:
+            sex_weights = {"Female": [], "Male": [], "Unknown": []}
             for record in self.recorded_data:
-                sex_groups[record["Sex"]].append(float(record["Weight"]))
-            for sex, weights in sex_groups.items():
-                summary_stats[f'Average Weight ({sex})'] = sum(weights) / len(weights)
+                if "Sex" in record and "Weight" in record and record["Weight"]:
+                    sex_weights[record["Sex"]].append(float(record["Weight"]))
+            for sex, weights in sex_weights.items():
+                if weights:
+                    average_weight = sum(weights) / len(weights)
+                    summary.append(f"Average Weight ({sex}): {average_weight:.2f}")
 
-        if 'Maturation' in self.statistics_options:
-            maturation_groups = defaultdict(list)
+        if "Percentage of Mature Fish" in self.selected_stats:
+            maturation_count = {"Mature": 0, "Immature": 0, "Unknown": 0}
             for record in self.recorded_data:
-                maturation_groups[record["Maturation"]].append(float(record["Weight"]))
-            for maturation, weights in maturation_groups.items():
-                summary_stats[f'Average Weight ({maturation})'] = sum(weights) / len(weights)
+                if "Maturation" in record:
+                    maturation_count[record["Maturation"]] += 1
+            if len(self.recorded_data) > 0:
+                mature_percentage = (maturation_count["Mature"] / len(self.recorded_data)) * 100
+                summary.append(f"Percentage of Mature Fish: {mature_percentage:.2f}%")
 
-        self.update_summary()
-        self.summary_text.insert(tk.END, "\nStatistics:\n")
-        for stat, value in summary_stats.items():
-            self.summary_text.insert(tk.END, f"{stat}: {value:.2f}\n")
+        self.summary_text.insert(tk.END, "\n".join(summary) + "\n")
 
 if __name__ == "__main__":
     app = FishRecorder()
     app.mainloop()
+
 
 
