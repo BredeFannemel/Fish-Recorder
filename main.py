@@ -22,6 +22,7 @@ class FishRecorderApp(tk.Tk):
         self.summary_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Initialize components
+        self.data_entry = DataEntry(self.input_frame)
         self.plot_manager = PlotManager(self.plot_frame)
         self.summary_manager = SummaryManager(self.summary_frame)
 
