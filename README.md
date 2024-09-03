@@ -1,4 +1,4 @@
-FishRecorder/
+FishRecorder//
 main_app.py            # Main application entry point/
 data_entry.py          # DataEntry class for managing input fields/
 summary.py             # Summary class for managing the summary table/
