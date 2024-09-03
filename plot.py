@@ -11,7 +11,7 @@ class Plot(tk.Frame):
     def create_widgets(self):
         self.fig, self.ax = plt.subplots(figsize=(5, 4))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().grid(row=0, column=0, padx=10, pady=10)
+        self.canvas.get_tk_widget().grid(row=1, column=2, padx=10, pady=10)
 
     def update_histogram(self, weights):
         self.ax.clear()
