@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class PlotManager:
+class PlotManagerSummary:
     def __init__(self, master):
         self.master = master
         self.fig, self.ax = plt.subplots(figsize=(6, 4))
