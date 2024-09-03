@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class FishRecorder(tk.Tk):
     def __init__(self):
@@ -8,10 +11,11 @@ class FishRecorder(tk.Tk):
         self.title("Fish Recorder")
         self.available_traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield 1", "Freefield 2"]
         self.selected_traits = []
-        self.available_stats = ["Number of Fish Recorded", "Average Weight", "Average Weight per Sex", "Percentage of Mature Fish"]
+        self.available_stats = ["Number of Fish Recorded", "Average Weight", "Average Weight per Sex", "Percentage of Mature Fish", "Number of Registered Today"]
         self.selected_stats = []
         self.recorded_data = []  # Initialize the list to store records
         self.load_existing_data()
+        self.animal_info = {}  # To store information from imported file
         self.create_widgets()
 
     def create_widgets(self):
@@ -42,7 +46,7 @@ class FishRecorder(tk.Tk):
         self.apply_stat_button.grid(row=len(self.available_traits) + 3 + len(self.available_stats), column=0, pady=10)
 
         # Import file button
-        self.import_button = ttk.Button(self, text="Import Data", command=self.import_data)
+        self.import_button = ttk.Button(self, text="Import Animal Information", command=self.import_data)
         self.import_button.grid(row=len(self.available_traits) + 4 + len(self.available_stats), column=0, pady=10)
 
         # Dynamic form area
@@ -59,6 +63,10 @@ class FishRecorder(tk.Tk):
         self.summary_label.grid(row=len(self.available_traits) + 6 + len(self.available_stats), column=0, columnspan=2, pady=10)
         self.summary_text = tk.Text(self, height=10, width=50)
         self.summary_text.grid(row=len(self.available_traits) + 7 + len(self.available_stats), column=0, columnspan=2, padx=10, pady=5)
+
+        # Histogram Button
+        self.histogram_button = ttk.Button(self, text="Show Weight Histogram", command=self.show_histogram)
+        self.histogram_button.grid(row=len(self.available_traits) + 8 + len(self.available_stats), column=0, pady=10)
 
     def apply_trait_selection(self):
         """Apply selected traits and dynamically create form fields."""
@@ -113,7 +121,8 @@ class FishRecorder(tk.Tk):
                 messagebox.showwarning("Duplicate ID", "This Animal ID already exists in the records.")
             else:
                 self.entry_widgets["Animal ID"].config(background="white")  # Reset background color
-
+                # Add timestamp
+                record["Timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 # Store the record
                 self.recorded_data.append(record)
                 self.update_summary()
@@ -134,7 +143,7 @@ class FishRecorder(tk.Tk):
     def save_to_file(self, record):
         """ Save the current record to a text file in tabulated format """
         with open('fish_records.txt', 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=self.selected_traits, delimiter='\t')
+            writer = csv.DictWriter(file, fieldnames=self.selected_traits + ["Timestamp"], delimiter='\t')
             if file.tell() == 0:  # Write header if the file is new/empty
                 writer.writeheader()
             writer.writerow(record)
@@ -149,30 +158,27 @@ class FishRecorder(tk.Tk):
             pass  # No existing file found, start with an empty list
 
     def import_data(self):
-        """ Import animal data from a CSV file """
+        """ Import animal data from a tabulated text file """
         file_path = filedialog.askopenfilename(
             title="Select file",
-            filetypes=(("CSV files", "*.csv"), ("All files", "*.*"))
+            filetypes=(("Text files", "*.txt"), ("All files", "*.*"))
         )
         if file_path:
             try:
                 with open(file_path, 'r') as file:
-                    reader = csv.DictReader(file)
-                    for row in reader:
-                        if "Animal ID" in row and row["Animal ID"] and not self.is_duplicate_animal_id(row["Animal ID"]):
-                            self.recorded_data.append(row)
-                self.update_summary()
-                messagebox.showinfo("Import Success", "Data imported successfully!")
+                    reader = csv.DictReader(file, delimiter='\t')
+                    self.animal_info = {row["Animal ID"]: row for row in reader}
+                    messagebox.showinfo("Import Success", "Animal information imported successfully!")
             except Exception as e:
-                messagebox.showerror("Import Error", f"An error occurred while importing data: {e}")
+                messagebox.showerror("Import Error", f"An error occurred while importing: {e}")
 
     def clear_form(self):
         """ Clear all fields after saving a record """
         for entry in self.entry_widgets.values():
-            if isinstance(entry, ttk.Entry):
-                entry.delete(0, tk.END)
-            elif isinstance(entry, ttk.Combobox):
+            if isinstance(entry, ttk.Combobox):
                 entry.set('')
+            else:
+                entry.delete(0, tk.END)
 
     def update_summary(self):
         """ Update the summary table with recorded data """
@@ -209,8 +215,29 @@ class FishRecorder(tk.Tk):
                 mature_percentage = (maturation_count["Mature"] / len(self.recorded_data)) * 100
                 summary.append(f"Percentage of Mature Fish: {mature_percentage:.2f}%")
 
+        if "Number of Registered Today" in self.selected_stats:
+            today = datetime.now().strftime("%Y-%m-%d")
+            registered_today = len([record for record in self.recorded_data if record["Timestamp"].startswith(today)])
+            summary.append(f"Number of Registered Today: {registered_today}")
+
         self.summary_text.insert(tk.END, "\n".join(summary) + "\n")
+
+    def show_histogram(self):
+        """ Display a histogram of recorded weights """
+        weights = [float(record["Weight"]) for record in self.recorded_data if "Weight" in record and record["Weight"]]
+        if weights:
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.hist(weights, bins=10, color='blue', edgecolor='black')
+            ax.set_title('Histogram of Fish Weights')
+            ax.set_xlabel('Weight')
+            ax.set_ylabel('Frequency')
+
+            # Embed the plot into the Tkinter window
+            canvas = FigureCanvasTkAgg(fig, master=self)
+            canvas.draw()
+            canvas.get_tk_widget().grid(row=len(self.available_traits) + 9 + len(self.available_stats), column=0, columnspan=2)
 
 if __name__ == "__main__":
     app = FishRecorder()
     app.mainloop()
+
