@@ -1,5 +1,5 @@
 import tkinter as tk
-from plot import PlotManager  # Import PlotManager from plot.py
+from plot import Plot  # Import PlotManager from plot.py
 from summary import SummaryManager  # Import SummaryManager from summary.py
 from traits import TraitsManager  # Import TraitsManager from traits.py
 from import_export import ImportManager  # Import ImportManager from importer.py
