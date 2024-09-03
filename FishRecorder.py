@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 import csv
 
 class FishRecorder(tk.Tk):
@@ -41,20 +41,24 @@ class FishRecorder(tk.Tk):
         self.apply_stat_button = ttk.Button(self, text="Apply Statistics", command=self.apply_stat_selection)
         self.apply_stat_button.grid(row=len(self.available_traits) + 3 + len(self.available_stats), column=0, pady=10)
 
+        # Import file button
+        self.import_button = ttk.Button(self, text="Import Data", command=self.import_data)
+        self.import_button.grid(row=len(self.available_traits) + 4 + len(self.available_stats), column=0, pady=10)
+
         # Dynamic form area
         self.form_frame = ttk.Frame(self)
         self.form_frame.grid(row=0, column=1, rowspan=len(self.available_traits) + 4 + len(self.available_stats), padx=10, pady=5, sticky="n")
 
         # Save button
         self.save_button = ttk.Button(self, text="Save", command=self.save_record)
-        self.save_button.grid(row=len(self.available_traits) + 4 + len(self.available_stats), column=0, columnspan=2, pady=10)
+        self.save_button.grid(row=len(self.available_traits) + 5 + len(self.available_stats), column=0, columnspan=2, pady=10)
         self.save_button.bind("<Return>", lambda event: self.save_record())
 
         # Summary Table
         self.summary_label = ttk.Label(self, text="Summary")
-        self.summary_label.grid(row=len(self.available_traits) + 5 + len(self.available_stats), column=0, columnspan=2, pady=10)
+        self.summary_label.grid(row=len(self.available_traits) + 6 + len(self.available_stats), column=0, columnspan=2, pady=10)
         self.summary_text = tk.Text(self, height=10, width=50)
-        self.summary_text.grid(row=len(self.available_traits) + 6 + len(self.available_stats), column=0, columnspan=2, padx=10, pady=5)
+        self.summary_text.grid(row=len(self.available_traits) + 7 + len(self.available_stats), column=0, columnspan=2, padx=10, pady=5)
 
     def apply_trait_selection(self):
         """Apply selected traits and dynamically create form fields."""
@@ -144,6 +148,24 @@ class FishRecorder(tk.Tk):
         except FileNotFoundError:
             pass  # No existing file found, start with an empty list
 
+    def import_data(self):
+        """ Import animal data from a CSV file """
+        file_path = filedialog.askopenfilename(
+            title="Select file",
+            filetypes=(("CSV files", "*.csv"), ("All files", "*.*"))
+        )
+        if file_path:
+            try:
+                with open(file_path, 'r') as file:
+                    reader = csv.DictReader(file)
+                    for row in reader:
+                        if "Animal ID" in row and row["Animal ID"] and not self.is_duplicate_animal_id(row["Animal ID"]):
+                            self.recorded_data.append(row)
+                self.update_summary()
+                messagebox.showinfo("Import Success", "Data imported successfully!")
+            except Exception as e:
+                messagebox.showerror("Import Error", f"An error occurred while importing data: {e}")
+
     def clear_form(self):
         """ Clear all fields after saving a record """
         for entry in self.entry_widgets.values():
@@ -160,6 +182,7 @@ class FishRecorder(tk.Tk):
             return
 
         summary = []
+
         if "Number of Fish Recorded" in self.selected_stats:
             summary.append(f"Number of Fish Recorded: {len(self.recorded_data)}")
 
@@ -170,13 +193,11 @@ class FishRecorder(tk.Tk):
                 summary.append(f"Average Weight: {average_weight:.2f}")
 
         if "Average Weight per Sex" in self.selected_stats:
-            sex_weights = {"Female": [], "Male": [], "Unknown": []}
-            for record in self.recorded_data:
-                if "Sex" in record and "Weight" in record and record["Weight"]:
-                    sex_weights[record["Sex"]].append(float(record["Weight"]))
-            for sex, weights in sex_weights.items():
-                if weights:
-                    average_weight = sum(weights) / len(weights)
+            sexes = ["Female", "Male", "Unknown"]
+            for sex in sexes:
+                sex_weights = [float(record["Weight"]) for record in self.recorded_data if "Weight" in record and "Sex" in record and record["Sex"] == sex and record["Weight"]]
+                if sex_weights:
+                    average_weight = sum(sex_weights) / len(sex_weights)
                     summary.append(f"Average Weight ({sex}): {average_weight:.2f}")
 
         if "Percentage of Mature Fish" in self.selected_stats:
@@ -193,6 +214,3 @@ class FishRecorder(tk.Tk):
 if __name__ == "__main__":
     app = FishRecorder()
     app.mainloop()
-
-
-
