@@ -1,15 +1,18 @@
-import datetime
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-def get_current_datetime():
-    """Returns the current date and time as a string."""
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+class PlotManager:
+    def __init__(self, master):
+        self.master = master
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
+        self.canvas.get_tk_widget().pack()
 
-def validate_float(value_if_allowed):
-    """ Validate that the input is a float number """
-    if value_if_allowed in ["", "-", ".", "-."]:
-        return True
-    try:
-        float(value_if_allowed)
-        return True
-    except ValueError:
-        return False
+    def update_histogram(self, weights):
+        """ Update the histogram with new data """
+        self.ax.clear()
+        self.ax.hist(weights, bins=10, color='blue', edgecolor='black')
+        self.ax.set_title("Weight Distribution")
+        self.ax.set_xlabel("Weight")
+        self.ax.set_ylabel("Number of Fish")
+        self.canvas.draw()
