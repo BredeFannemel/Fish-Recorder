@@ -2,7 +2,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class Plot(tk.Frame):
+class PlotManager(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
