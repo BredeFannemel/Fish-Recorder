@@ -18,7 +18,7 @@ class MainApp(tk.Tk):
         # Layout
         self.data_entry.grid(row=0, column=0, padx=10, pady=10)
         self.summary.grid(row=1, column=0, padx=10, pady=10)
-        self.plot.grid(row=0, column=1, rowspan=2, padx=10, pady=10)
+        self.plot.grid(row=0, column=10, rowspan=2, padx=10, pady=10)
 
         # Import file button
         self.import_button = tk.Button(self, text="Import File", command=self.import_export.import_file)
