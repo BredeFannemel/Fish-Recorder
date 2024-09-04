@@ -58,37 +58,6 @@ class DataEntry(tk.Frame):
         self.plate_entry.config(state=tk.NORMAL)
         self.well_entry.config(state=tk.NORMAL)
 
-    def save_record(self):
-        """Save the current record to a text file."""
-        record = self.traits_manager.get_entry_values()
-
-        # Add plate and well to record
-        record["Plate"] = self.plate_entry.get()
-        record["Well"] = self.well_display.get()
-
-        # Add timestamp
-        record["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # Save record to file
-        self.save_to_file(record)
-
-        # Move to next well
-        self.move_to_next_well()
-        if not self.plate_selected:
-            messagebox.showwarning("Plate Not Confirmed", "Please confirm the plate before saving.")
-            return
-
-        def save_to_file(self, record):
-        """ Save the current record to a text file in tabulated format """
-        with open('fish_records.txt', 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=list(record.keys()), delimiter='\t')
-            if file.tell() == 0:  # Write header if the file is new/empty
-                writer.writeheader()
-            writer.writerow(record)
-
-        # Reset form fields
-        self.traits_manager.clear_entries()
-
     def validate_float(self, value_if_allowed):
         """ Validate that the input is a float number """
         if value_if_allowed in ["", "-", ".", "-."]:
