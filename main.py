@@ -50,12 +50,6 @@ class FishRecorder(tk.Tk):
         # Save record to file
         self.save_to_file(record)
 
-        # Move to next well
-        self.move_to_next_well()
-        if not self.plate_selected:
-            messagebox.showwarning("Plate Not Confirmed", "Please confirm the plate before saving.")
-            return
-
         # Reset form fields
         self.traits_manager.clear_entries()
 
