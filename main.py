@@ -3,14 +3,15 @@ from tkinter import ttk
 from traits import TraitsManager
 from entry import DataEntry
 from summary import SummaryManager
+import datetime  # Add this import to fix the NameError
 
 class FishRecorder(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Fish Recorder")
 
-        #1 Traits Manager Setup
-        traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield1", "Freefield2", "Plate", "Well"]
+        # Traits Manager Setup
+        traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield1", "Freefield2", "Freefield3", "Freefield4"]
         self.trait_frame = tk.Frame(self)
         self.trait_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
 
@@ -19,17 +20,17 @@ class FishRecorder(tk.Tk):
 
         self.traits_manager = TraitsManager(self.trait_frame, traits, self.form_frame, self.on_traits_applied)
 
-        #2 Data Entry Setup
+        # Data Entry Setup
         self.data_entry = DataEntry(self, self.traits_manager)
         self.data_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nw")
 
-        #3 Summary Manager Setup
+        # Summary Manager Setup
         self.summary_manager = SummaryManager(self)
-        self.summary_manager.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nw")
+        self.summary_manager.grid(row=0, column=2, rowspan=3, padx=10, pady=10, sticky="ne")
 
         # Save Button
         self.save_button = ttk.Button(self, text="Save", command=self.save_record)
-        self.save_button.grid(row=1, column=0, padx=10, pady=10)
+        self.save_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     def on_traits_applied(self, selected_traits):
         """Callback when traits are applied."""
