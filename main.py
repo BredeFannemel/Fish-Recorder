@@ -47,9 +47,6 @@ class FishRecorder(tk.Tk):
         # Add timestamp
         record["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Save record to file
-        self.save_to_file(record)
-
         # Reset form fields
         self.traits_manager.clear_entries()
 
