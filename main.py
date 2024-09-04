@@ -1,5 +1,5 @@
 import tkinter as tk
-from data_entry import DataEntry #Import data_entry from data_entry.py
+from entry import DataEntry #Import data_entry from data_entry.py
 from plot import PlotManager  # Import PlotManager from plot.py
 from utils import PlotManagerSummary #Import PlotManagerSummary from utils.py
 from summary import SummaryManager  # Import SummaryManager from summary.py
