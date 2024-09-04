@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from traits import TraitsManager
+from entry import DataEntry
 
 class FishRecorder(tk.Tk):
     def __init__(self):
@@ -17,7 +18,11 @@ class FishRecorder(tk.Tk):
 
         self.traits_manager = TraitsManager(self.trait_frame, traits, self.form_frame, self.on_traits_applied)
 
-        #2 Save Button
+        #2 Data Entry Setup
+        self.data_entry = DataEntry(self, self.traits_manager)
+        self.data_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nw")
+
+        #3 Save Button
         self.save_button = ttk.Button(self, text="Save", command=self.save_record)
         self.save_button.grid(row=1, column=0, padx=10, pady=10)
 
