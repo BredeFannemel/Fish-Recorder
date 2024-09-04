@@ -2,20 +2,16 @@ import tkinter as tk
 from collections import defaultdict
 from statistics import mean
 
-class SummaryManager:
+class SummaryManager(tk.Frame):
     def __init__(self, master):
-        self.master = master
+        super().__init__(master)
 
         # Layout
-        self.summary_frame = tk.Frame(self.master)
-        self.summary_frame.grid(row=0, column=0, padx=10, pady=5, sticky="nsew")
-
-        # Text widget for displaying the summary
-        self.summary_text = tk.Text(self.summary_frame, height=10, width=100, state=tk.DISABLED)
+        self.summary_text = tk.Text(self, height=10, width=100, state=tk.DISABLED)
         self.summary_text.grid(row=0, column=0, padx=10, pady=5, sticky="nsew")
 
         # Scrollbar for the text widget
-        scrollbar = tk.Scrollbar(self.summary_frame, command=self.summary_text.yview)
+        scrollbar = tk.Scrollbar(self, command=self.summary_text.yview)
         scrollbar.grid(row=0, column=1, sticky='ns')
         self.summary_text['yscrollcommand'] = scrollbar.set
 
