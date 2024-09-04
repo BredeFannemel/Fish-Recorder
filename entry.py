@@ -8,8 +8,7 @@ class DataEntry(tk.Frame):
         self.current_plate = 1
         self.current_well_index = 1
         self.well_plate_labels = []
-        self.update_well_plate_display()
-        
+                
         # Dynamic form based on selected traits
         self.form_frame = tk.Frame(self)
         self.form_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
