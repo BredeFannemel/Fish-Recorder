@@ -104,7 +104,7 @@ class DataEntry(tk.Frame):
                 well_index = i * 12 + j + 1
                 well_name = f"{chr(65 + i)}{j + 1:02d}"
                 color = "green" if well_index < self.current_well_index else "white"
-                label = tk.Label(self.well_plate_frame, text=well_name, bg=color, width=3, height=1, relief="solid")
+                label = tk.Label(self.well_plate_labels, text=well_name, bg=color, width=3, height=1, relief="solid")
                 label.grid(row=i, column=j, padx=1, pady=1)
                 self.well_plate_labels.append(label)
 
