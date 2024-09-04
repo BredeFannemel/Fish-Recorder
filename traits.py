@@ -42,6 +42,8 @@ class TraitsManager:
                 entry = ttk.Combobox(self.form_frame, values=["Male", "Female"])
             elif trait == "Maturation":
                 entry = ttk.Combobox(self.form_frame, values=["Immature", "Mature"])
+            elif trait == "Selection":
+                entry = ttk.Combobox(self.form_frame, values=["Selected", "Culled", "Blank"]
             else:
                 entry = tk.Entry(self.form_frame)
 
