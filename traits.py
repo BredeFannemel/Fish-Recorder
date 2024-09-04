@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 class TraitsManager:
     def __init__(self, master, traits, form_frame, callback):
@@ -7,7 +8,6 @@ class TraitsManager:
         self.callback = callback
         self.selected_traits = []
 
-        # Checkbuttons for each trait
         self.trait_vars = {}
         self.checkbuttons = {}
         for i, trait in enumerate(self.traits):
@@ -36,7 +36,15 @@ class TraitsManager:
         for i, trait in enumerate(self.selected_traits):
             label = tk.Label(self.form_frame, text=f"{trait}:")
             label.grid(row=i, column=0, sticky="e")
-            entry = tk.Entry(self.form_frame)
+
+            # Use Combobox for specific traits
+            if trait == "Sex":
+                entry = ttk.Combobox(self.form_frame, values=["Male", "Female"])
+            elif trait == "Maturation":
+                entry = ttk.Combobox(self.form_frame, values=["Immature", "Mature"])
+            else:
+                entry = tk.Entry(self.form_frame)
+
             entry.grid(row=i, column=1, sticky="w")
             self.entries[trait] = entry
 
