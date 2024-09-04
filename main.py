@@ -1,54 +1,36 @@
 import tkinter as tk
-from entry import DataEntry #Import data_entry from entry.py
-from plot import PlotManager  # Import PlotManager from plot.py
-from utils import PlotManagerSummary #Import PlotManagerSummary from utils.py
-from summary import SummaryManager  # Import SummaryManager from summary.py
-from traits import TraitsManager  # Import TraitsManager from traits.py
-from import_export import ImportManager  # Import ImportManager from importer.py
+from tkinter import ttk
+from traits import TraitsManager
 
-class FishRecorderApp(tk.Tk):
+class FishRecorder(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Fish Recorder")
 
-        # Create main frames
-        self.input_frame = tk.Frame(self)
-        self.input_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
+        #1 Traits Manager Setup
+        traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield1", "Freefield2", "Plate", "Well"]
+        self.trait_frame = tk.Frame(self)
+        self.trait_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
 
-        self.plot_frame = tk.Frame(self)
-        self.plot_frame.grid(row=0, column=1, padx=10, pady=10, sticky="ne")
+        self.form_frame = tk.Frame(self)
+        self.form_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nw")
 
-        self.summary_frame = tk.Frame(self)
-        self.summary_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.traits_manager = TraitsManager(self.trait_frame, traits, self.form_frame, self.on_traits_applied)
 
-        # Initialize components
-        self.entry = DataEntry(self.input_frame)
-        self.plot_manager = PlotManager(self.plot_frame)
-        self.summary_manager = SummaryManager(self.summary_frame)
+        #2 Save Button
+        self.save_button = ttk.Button(self, text="Save", command=self.save_record)
+        self.save_button.grid(row=1, column=0, padx=10, pady=10)
 
-        self.traits = ["Animal ID", "Weight", "Sex", "Maturation", "Selection", "Freefield 1", "Freefield 2"]
-        self.traits_manager = TraitsManager(self.input_frame, self.traits, self.apply_traits)
-
-        self.statistics = ["Number of Fish Recorded", "Average Weight", "Average Weight per Sex", 
-                           "Percentage of Mature Fish", "Number of Registered Today"]
-
-        self.import_manager = ImportManager(self.input_frame)
-
-        # Create the save button
-        self.save_button = tk.Button(self.input_frame, text="Save", command=self.save_record)
-        self.save_button.grid(row=len(self.traits) + len(self.statistics) + 3, column=0, pady=5)
-
-    def apply_traits(self, selected_traits):
-        """ Handle the application of selected traits """
-        print("Selected traits:", selected_traits)
-        # Logic to update UI based on selected traits
+    def on_traits_applied(self, selected_traits):
+        """Callback when traits are applied."""
+        print(f"Selected Traits: {selected_traits}")
 
     def save_record(self):
-        """ Handle saving the record """
-        # Logic to save the record
-        print("Record saved!")
+        """Save the record."""
+        values = self.traits_manager.get_entry_values()
+        print(f"Record to Save: {values}")
+        self.traits_manager.clear_entries()
 
 if __name__ == "__main__":
-    app = FishRecorderApp()
+    app = FishRecorder()
     app.mainloop()
-
