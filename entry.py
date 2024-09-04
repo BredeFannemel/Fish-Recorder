@@ -55,9 +55,13 @@ class DataEntry(tk.Frame):
         self.save_button.grid(row=7, column=0, columnspan=2, pady=10)
         self.save_button.bind("<Return>", lambda event: self.save_record())
 
-    def save_record(self):
-        # Gather data, perform validation, and save the record
-        # (Implement the logic similar to your current script)
+    def save_to_file(self, record):
+        """ Save the current record to a text file in tabulated format """
+        with open('fish_records.txt', 'a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=self.selected_traits + ["Timestamp"], delimiter='\t')
+            if file.tell() == 0:  # Write header if the file is new/empty
+                writer.writeheader()
+            writer.writerow(record)
 
         # Reset form fields
         self.clear_form()
