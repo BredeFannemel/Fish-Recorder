@@ -8,14 +8,47 @@ class DataEntry(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        # Input fields (Animal ID, Weight, etc.)
+        # Input field (Animal ID)
         self.animal_entry_label = ttk.Label(self, text="Animal ID:")
         self.animal_entry = ttk.Entry(self)
         self.animal_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
         self.animal_entry_label.grid(row=0, column=0, padx=10, pady=5, sticky="e")
 
-        # Other fields as previously defined (Weight, Sex, Maturation, etc.)
-        # (Repeat the code for creating fields like in your initial script)
+        # Weight float
+        self.weight_label = ttk.Label(self, text="Weight:")
+        self.weight_entry = ttk.Entry(self, validate="key", validatecommand=(self.register(self.validate_float), '%P'))
+        self.weight_label.grid(row=1, column=0, padx=10, pady=5, sticky="e")
+        self.weight_entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+
+        # Sex combobox
+        self.sex_label = ttk.Label(self, text="Sex:")
+        self.sex_combobox = ttk.Combobox(self, values=["Female", "Male", "Unknown"], state="readonly")
+        self.sex_label.grid(row=2, column=0, padx=10, pady=5, sticky="e")
+        self.sex_combobox.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+
+        # Maturation combobox
+        self.maturation_label = ttk.Label(self, text="Maturation:")
+        self.maturation_combobox = ttk.Combobox(self, values=["Mature", "Immature", "Unknown"], state="readonly")
+        self.maturation_label.grid(row=3, column=0, padx=10, pady=5, sticky="e")
+        self.maturation_combobox.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+
+        # Selection combobox
+        self.selection_label = ttk.Label(self, text="Selection:")
+        self.selection_combobox = ttk.Combobox(self, values=["Selected", "Culled"], state="readonly")
+        self.selection_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
+        self.selection_combobox.grid(row=4, column=1, padx=10, pady=5, sticky="w")
+
+        # Freefield1 entry
+        self.freefield1_entry_label = ttk.Label(self, text="Freefield 1:")
+        self.freefield1_entry = ttk.Entry(self)
+        self.freefield1_entry.grid(row=5, column=1, padx=10, pady=5, sticky="w")
+        self.freefield1_entry_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
+
+        #Freefield2 entry
+        self.freefield2_entry_label = ttk.Label(self, text="Freefield 2:")
+        self.freefield2_entry = ttk.Entry(self)
+        self.freefield2_entry.grid(row=6, column=1, padx=10, pady=5, sticky="w")
+        self.freefield2_entry_label.grid(row=6, column=0, padx=10, pady=5, sticky="e")
 
         # Save button
         self.save_button = ttk.Button(self, text="Save", command=self.save_record)
