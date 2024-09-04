@@ -1,5 +1,5 @@
 import tkinter as tk
-from entry import DataEntry #Import data_entry from data_entry.py
+from entry import DataEntry #Import data_entry from entry.py
 from plot import PlotManager  # Import PlotManager from plot.py
 from utils import PlotManagerSummary #Import PlotManagerSummary from utils.py
 from summary import SummaryManager  # Import SummaryManager from summary.py
@@ -22,7 +22,7 @@ class FishRecorderApp(tk.Tk):
         self.summary_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Initialize components
-        self.data_entry = DataEntry(self.input_frame)
+        self.entry = DataEntry(self.input_frame)
         self.plot_manager = PlotManager(self.plot_frame)
         self.summary_manager = SummaryManager(self.summary_frame)
 
