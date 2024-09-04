@@ -33,11 +33,11 @@ class FishRecorder(tk.Tk):
         self.save_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     def on_traits_applied(self, selected_traits):
-        "Callback when traits are applied."
+        #Callback when traits are applied
         print(f"Selected Traits: {selected_traits}")
 
     def save_record(self):
-        "Save the current record to a text file."
+        # Save the current record to a text file
         record = self.traits_manager.get_entry_values()
 
         # Add plate and well to record
@@ -57,7 +57,7 @@ class FishRecorder(tk.Tk):
             return
 
         def save_to_file(self, record):
-        "Save the current record to a text file in tabulated format"
+        # Save the current record to a text file in tabulated format
         with open('fish_records.txt', 'a', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=list(record.keys()), delimiter='\t')
             if file.tell() == 0:  # Write header if the file is new/empty
