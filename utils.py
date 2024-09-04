@@ -8,11 +8,17 @@ class PlotManagerSummary:
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.canvas.get_tk_widget().pack()
 
-    def update_histogram(self, weights):
-        """ Update the histogram with new data """
-        self.ax.clear()
-        self.ax.hist(weights, bins=10, color='blue', edgecolor='black')
-        self.ax.set_title("Weight Distribution")
-        self.ax.set_xlabel("Weight")
-        self.ax.set_ylabel("Number of Fish")
-        self.canvas.draw()
+     def show_histogram(self):
+        """ Display a histogram of recorded weights """
+        weights = [float(record["Weight"]) for record in self.recorded_data if "Weight" in record and record["Weight"]]
+        if weights:
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.hist(weights, bins=10, color='blue', edgecolor='black')
+            ax.set_title('Histogram of Fish Weights')
+            ax.set_xlabel('Weight')
+            ax.set_ylabel('Frequency')
+
+            # Embed the plot into the Tkinter window
+            canvas = FigureCanvasTkAgg(fig, master=self)
+            canvas.draw()
+            canvas.get_tk_widget().grid(row=len(self.available_traits) + 9 + len(self.available_stats), column=0, columnspan=2)
