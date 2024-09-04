@@ -56,14 +56,6 @@ class FishRecorder(tk.Tk):
             messagebox.showwarning("Plate Not Confirmed", "Please confirm the plate before saving.")
             return
 
-        def save_to_file(self, record):
-        # Save the current record to a text file in tabulated format
-        with open('fish_records.txt', 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=list(record.keys()), delimiter='\t')
-            if file.tell() == 0:  # Write header if the file is new/empty
-                writer.writeheader()
-            writer.writerow(record)
-
         # Reset form fields
         self.traits_manager.clear_entries()
 
