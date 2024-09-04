@@ -18,8 +18,8 @@ class DataEntry(tk.Frame):
         self.traits_manager.apply_trait_selection()  # Initialize form with selected traits
 
         # Plate and Well info
-        self.plate_label = ttk.Label(self, text="Plate:")
-        self.plate_entry = ttk.Entry(self)
+        self.plate_label = tk.Label(self, text="Plate:")
+        self.plate_entry = tk.Entry(self)
         self.plate_label.grid(row=1, column=0, padx=10, pady=5, sticky="e")
         self.plate_entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
         self.plate_entry.bind("<Return>", self.reset_plate)  # Bind Enter key to reset plate
