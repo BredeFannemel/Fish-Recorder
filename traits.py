@@ -39,9 +39,9 @@ class TraitsManager:
 
             # Use Combobox for specific traits
             if trait == "Sex":
-                entry = ttk.Combobox(self.form_frame, values=["Male", "Female"])
+                entry = ttk.Combobox(self.form_frame, values=["Male", "Female", "Unknown"])
             elif trait == "Maturation":
-                entry = ttk.Combobox(self.form_frame, values=["Immature", "Mature"])
+                entry = ttk.Combobox(self.form_frame, values=["Immature", "Mature", "Unknown", "Blank"])
             else:
                 entry = tk.Entry(self.form_frame)
 
@@ -53,7 +53,6 @@ class TraitsManager:
         return {trait: self.entries[trait].get() for trait in self.selected_traits}
 
     def clear_entries(self):
-        """Clear all the entries in the form."""
+        """Clear the form fields."""
         for entry in self.entries.values():
             entry.delete(0, tk.END)
-
