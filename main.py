@@ -3,7 +3,7 @@ from tkinter import ttk
 from traits import TraitsManager
 from entry import DataEntry
 from summary import SummaryManager
-import datetime  # Add this import to fix the NameError
+import datetime
 
 class FishRecorder(tk.Tk):
     def __init__(self):
@@ -33,22 +33,25 @@ class FishRecorder(tk.Tk):
         self.save_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     def on_traits_applied(self, selected_traits):
-        #Callback when traits are applied
+        # Callback when traits are applied
         print(f"Selected Traits: {selected_traits}")
 
     def save_record(self):
         # Save the current record to a text file
         record = self.traits_manager.get_entry_values()
 
-        # Add plate and well to record
-        record["Plate"] = self.plate_entry.get()
-        record["Well"] = self.well_display.get()
+        # Add plate and well to record (from DataEntry)
+        record["Plate"] = self.data_entry.plate_var.get()
+        record["Well"] = self.data_entry.well_var.get()
 
         # Add timestamp
         record["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Reset form fields
         self.traits_manager.clear_entries()
+
+        # Add record to summary manager
+        self.summary_manager.add_record(record)
 
 if __name__ == "__main__":
     app = FishRecorder()
