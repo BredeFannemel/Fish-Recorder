@@ -39,27 +39,27 @@ class FishRecorder(tk.Tk):
     def save_record(self):
         # Save the current record to a text file
         record = self.traits_manager.get_entry_values()
-
+    
         # Add plate and well to record (from DataEntry)
         record["Plate"] = self.data_entry.plate_var.get()
-
+    
         # Automatically assign well if none is entered
         if not self.data_entry.well_var.get():
-        well = self.data_entry.assign_well()
-        if well:
-            record["Well"] = well
+            well = self.data_entry.assign_well()
+            if well:
+                record["Well"] = well
+            else:
+                messagebox.showwarning("No Well Available", "No well available to assign.")
+                return  # Exit if no wells available
         else:
-            messagebox.showwarning("No Well Available", "No well available to assign.")
-            return  # Exit if no wells available
-        else:
-        record["Well"] = self.data_entry.well_var.get()
-
+            record["Well"] = self.data_entry.well_var.get()
+    
         # Add timestamp
         record["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+    
         # Reset form fields
         self.traits_manager.clear_entries()
-
+    
         # Add record to summary manager
         self.summary_manager.add_record(record)
 
