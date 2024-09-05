@@ -51,3 +51,9 @@ class TraitsManager:
     def get_entry_values(self):
         """Retrieve values entered in the form."""
         return {trait: self.entries[trait].get() for trait in self.selected_traits}
+
+    def clear_entries(self):
+        """Clear all the entries in the form."""
+        for entry in self.entries.values():
+            entry.delete(0, tk.END)
+
