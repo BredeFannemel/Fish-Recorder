@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from traits import TraitsManager
 from entry import DataEntry
 from summary import SummaryManager
@@ -39,10 +39,17 @@ class FishRecorder(tk.Tk):
     def save_record(self):
         # Save the current record to a text file
         record = self.traits_manager.get_entry_values()
-    
+
+        # Convert weight to float if it's present
+        try:
+            record["Weight"] = float(record["Weight"])
+        except ValueError:
+            messagebox.showwarning("Invalid Weight", "Weight must be a valid number.")
+            return
+
         # Add plate and well to record (from DataEntry)
         record["Plate"] = self.data_entry.plate_var.get()
-    
+
         # Automatically assign well if none is entered
         if not self.data_entry.well_var.get():
             well = self.data_entry.assign_well()
@@ -53,13 +60,13 @@ class FishRecorder(tk.Tk):
                 return  # Exit if no wells available
         else:
             record["Well"] = self.data_entry.well_var.get()
-    
+
         # Add timestamp
         record["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
         # Reset form fields
         self.traits_manager.clear_entries()
-    
+
         # Add record to summary manager
         self.summary_manager.add_record(record)
 
