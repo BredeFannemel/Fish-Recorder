@@ -54,16 +54,37 @@ class DataEntry(tk.Frame):
         self.well_entry.config(state=tk.NORMAL)
         self.current_well_index = 1  # Reset well assignment index
 
-    def assign_well(self):
-        """Automatic well assignment logic."""
+    def create_well_plate(self):
+        """Create a visual representation of the well plate (8x12 grid)."""
         rows = "ABCDEFGH"
-        cols = [str(i).zfill(2) for i in range(1, 13)]
-        # Skip A01 for control, starting from A02
-        available_wells = [row + col for row in rows for col in cols if row + col != "A01"]
-        
-        if self.current_well_index >= len(available_wells):
-            return None  # No wells available
+        for i, row in enumerate(rows):
+            for col in range(1, 13):
+                well_id = f"{row}{col:02d}"
+                color = "red" if well_id == "A01" else "white"  # Mark A01 as reserved
+                button = tk.Button(self.well_plate_frame, text=well_id, width=4, bg=color, state=tk.NORMAL)
+                button.grid(row=i, column=col-1)
+                self.wells[well_id] = button
 
-        next_well = available_wells[self.current_well_index]
-        self.current_well_index += 1
-        return next_well
+    def reset_well_plate(self):
+        """Reset the well plate display."""
+        for well_id, button in self.wells.items():
+            color = "red" if well_id == "A01" else "white"  # Mark A01 as reserved
+            button.config(bg=color)
+
+    def assign_well(self):
+        """Assign the next available well."""
+        rows = "ABCDEFGH"
+        while self.current_well_index < 97:  # Total of 96 wells (A01 to H12)
+            row = rows[(self.current_well_index - 1) // 12]  # Calculate row
+            col = (self.current_well_index - 1) % 12 + 1     # Calculate column
+            well_id = f"{row}{col:02d}"
+
+            # Skip A01 as it is reserved
+            if well_id != "A01":
+                self.wells[well_id].config(bg="green")  # Mark the well as used
+                self.current_well_index += 1
+                return well_id
+
+            self.current_well_index += 1
+        messagebox.showwarning("No More Wells", "All wells are occupied on this plate.")
+        return None
