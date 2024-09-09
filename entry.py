@@ -26,6 +26,12 @@ class DataEntry(tk.Frame):
         self.confirm_button = tk.Button(self, text="Confirm Plate", command=self.confirm_plate)
         self.confirm_button.grid(row=2, column=0, columnspan=2, pady=5)
 
+        # Display plate
+        self.well_plate_frame = tk.Frame(self)
+        self.well_plate_frame.grid(row=4, column=0, columnspan=2, pady=10)
+        self.wells = {}
+        self.create_well_plate()
+
         # New Plate Button
         self.new_plate_button = tk.Button(self, text="New Plate", command=self.new_plate)
         self.new_plate_button.grid(row=3, column=0, columnspan=2, pady=5)
